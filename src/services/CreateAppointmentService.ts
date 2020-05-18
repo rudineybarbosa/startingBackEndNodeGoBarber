@@ -3,6 +3,7 @@ import { getCustomRepository } from 'typeorm';
 
 import Appointment from '../models/Appointment';
 import AppointmentsRepository from '../repository/AppointmentsRepository';
+import AppError from '../errors/AppError';
 
 /**
  * ISP - Interface segregation principle: a lot interface are more flexible than one unique interface
@@ -35,7 +36,7 @@ class CreateAppointmentService {
     );
 
     if (appointmentInSameHour) {
-      throw Error('Already exists an appointment booked');
+      throw new AppError('Already exists an appointment booked');
     }
 
     const appointment = appointmentsRepository.create({

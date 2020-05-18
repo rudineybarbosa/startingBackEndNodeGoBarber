@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm';
 import { hash } from 'bcrypt';
 
 import User from '../models/User';
+import AppError from '../errors/AppError';
 
 /**
  * ISP - Interface segregation principle: a lot interface are more flexible than one unique interface
@@ -29,10 +30,10 @@ class CreateAppointmentService {
     });
 
     if (userFound) {
-      throw Error(`Already exists an user with email ${email}`);
+      throw new AppError(`Already exists an user with email ${email}`);
     }
 
-    const hashedPassword = await hash(password, 16);
+    const hashedPassword = await hash(password, 8);
 
     const user = usersRepository.create({
       name,

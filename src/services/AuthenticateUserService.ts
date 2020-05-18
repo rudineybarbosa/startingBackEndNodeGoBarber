@@ -4,6 +4,7 @@ import { sign } from 'jsonwebtoken';
 import configAuth from '../config/auth';
 
 import User from '../models/User';
+import AppError from '../errors/AppError';
 
 interface RequestDTO {
   email: string;
@@ -21,14 +22,14 @@ class AuthenticateUserService {
 
     const user = await userRepository.findOne({ where: { email } });
     if (!user) {
-      throw new Error('Invalid email/password combination');
+      throw new AppError('Invalid email/password combination', 401);
     }
 
     const passworHashed = user.password;
     const hasMatch = await compare(password, passworHashed);
 
     if (!hasMatch) {
-      throw new Error('Invalid email/password combination');
+      throw new AppError('Invalid email/password combination', 401);
     }
 
     const token = sign({}, configAuth.jwt.secret, {
