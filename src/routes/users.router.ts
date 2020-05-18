@@ -6,6 +6,7 @@ import CreateUserService from '../services/CreateUserService';
 import User from '../models/User';
 import ensureAuthenticate from '../middleware/ensureAuthenticate';
 import uploadConfig from '../config/upload';
+import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
 
 const upload = multer(uploadConfig);
 const usersRouter = Router();
@@ -26,23 +27,19 @@ usersRouter.get('/', async (request, response) => {
  *  - return response
  * */
 usersRouter.post('/', async (request, response) => {
-  try {
-    const { name, email, password } = request.body;
+  const { name, email, password } = request.body;
 
-    const createUserService = new CreateUserService(); // call service with business logic
+  const createUserService = new CreateUserService(); // call service with business logic
 
-    const user = await createUserService.execute({
-      name,
-      email,
-      password,
-    }); // execute service and get response
+  const user = await createUserService.execute({
+    name,
+    email,
+    password,
+  }); // execute service and get response
 
-    delete user.password;
+  delete user.password;
 
-    return response.json(user); // return response
-  } catch (err) {
-    return response.status(400).json({ errorMessage: err.message });
-  }
+  return response.json(user); // return response
 });
 
 usersRouter.patch(
@@ -51,7 +48,13 @@ usersRouter.patch(
   upload.single('avatar'),
   async (request, response) => {
     // console.log(request.file);
-    return response.json({ ok: true });
+    const updateUserAvatarService = new UpdateUserAvatarService();
+    const user = await updateUserAvatarService.execute({
+      userId: request.user.id,
+      avatarFileName: request.file.filename,
+    });
+
+    return response.json(user);
   },
 );
 
